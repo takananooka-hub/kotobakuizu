@@ -1,0 +1,619 @@
+```html
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ことばクイズ 4たく（たいむ）</title>
+  <style>
+    :root{
+      --bg1:#fff6d8;
+      --bg2:#e9f7ff;
+      --card:#ffffff;
+      --text:#1b2a3a;
+      --muted:#4a6078;
+      --pink:#ff7aa2;
+      --blue:#63b3ff;
+      --good:#23c483;
+      --bad:#ff5a5f;
+    }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:var(--text);
+    }
+    .wrap{max-width:960px;margin:0 auto;padding:18px;}
+    .card{
+      background:var(--card);
+      border:2px solid rgba(99,179,255,.35);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 12px 24px rgba(0,0,0,.08);
+    }
+    h1{font-size:20px;margin:0 0 10px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .pill{
+      padding:6px 10px;border-radius:999px;
+      background:rgba(99,179,255,.18);
+      border:1px solid rgba(99,179,255,.35);
+      color:var(--muted);font-size:12px;
+      font-weight:700;
+    }
+    button{
+      cursor:pointer;border:0;border-radius:14px;
+      padding:10px 14px;font-weight:900;
+      background:rgba(255,122,162,.20);
+      color:var(--text);
+      border:2px solid rgba(255,122,162,.35);
+    }
+    button:hover{background:rgba(255,122,162,.28);}
+    button.primary{
+      background:rgba(99,179,255,.25);
+      border-color:rgba(99,179,255,.45);
+    }
+    button.primary:hover{background:rgba(99,179,255,.33);}
+    button:disabled{opacity:.55;cursor:not-allowed;}
+    select{
+      background:#fff; color:var(--text);
+      border:2px solid rgba(99,179,255,.35);
+      border-radius:12px; padding:7px 10px; font-weight:800;
+    }
+    .hr{height:2px;background:rgba(99,179,255,.22);margin:12px 0;}
+    .qbox{margin-top:12px;}
+    .prompt{
+      font-size:18px;line-height:1.6;margin:0 0 10px;
+      white-space:pre-wrap;
+      font-weight:800;
+    }
+    .choices{display:grid;grid-template-columns:1fr;gap:10px;}
+    @media (min-width:720px){ .choices{grid-template-columns:1fr 1fr;} }
+    .choice{
+      padding:12px 12px;border-radius:16px;
+      background:rgba(99,179,255,.10);
+      border:2px solid rgba(99,179,255,.18);
+      text-align:left;
+    }
+    .choice small{display:block;color:var(--muted);font-weight:700;margin-top:4px;}
+    .choice.correct{border-color:rgba(35,196,131,.75);background:rgba(35,196,131,.12);}
+    .choice.wrong{border-color:rgba(255,90,95,.75);background:rgba(255,90,95,.10);}
+    .status{
+      margin-top:10px;color:var(--muted);font-size:13px;
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      font-weight:900;
+    }
+    .msg{margin-top:10px;font-weight:1000;}
+    .msg.good{color:var(--good);}
+    .msg.bad{color:var(--bad);}
+    .best,.footer{color:var(--muted);font-size:12px;line-height:1.5;font-weight:700;}
+    .list{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12px;font-weight:700;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>ことばクイズ 4たく（たいむあたっく）</h1>
+
+    <div class="row" style="justify-content:space-between;">
+      <div class="row">
+        <span class="pill" id="modePill">しゅつだい：きもちのことば</span>
+        <span class="pill" id="progressPill">まだ はじめていません</span>
+        <span class="pill" id="timePill">00:00.000</span>
+      </div>
+      <div class="row">
+        <label class="pill">ジャンル：
+          <select id="cat">
+            <option value="emotion" selected>きもち（心情）</option>
+            <option value="person">ひと（人物）</option>
+            <option value="thing">もの（事物）</option>
+            <option value="mix">まぜる（ぜんぶ）</option>
+          </select>
+        </label>
+        <label class="pill">もんだい すう：
+          <select id="numQ">
+            <option>5</option>
+            <option selected>10</option>
+            <option>15</option>
+            <option>20</option>
+            <option>25</option>
+          </select>
+        </label>
+        <button class="primary" id="startBtn">はじめる</button>
+        <button id="resetBestBtn" title="きろくを けします">きろく りせっと</button>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div id="preArea">
+      <p class="best" id="bestLine">さいこう たいむ：—</p>
+      <p class="best">やりかた：ぶん（ようす）をよんで、いちばん あう「ことば」を えらびます。おわると たいむが でます。</p>
+      <ul class="list">
+        <li>ジャンル（きもち／ひと／もの／まぜる）を えらべます。</li>
+        <li>まちがえても つぎへ すすみます。</li>
+      </ul>
+    </div>
+
+    <div class="qbox" id="quizArea" style="display:none;">
+      <p class="prompt" id="prompt"></p>
+      <div class="choices" id="choices"></div>
+      <div class="msg" id="msg"></div>
+      <div class="status">
+        <div>せいかい：<span id="score">0</span></div>
+        <div>のこり：<span id="remain">0</span></div>
+      </div>
+    </div>
+
+    <div class="qbox" id="resultArea" style="display:none;">
+      <h2 style="font-size:18px;margin:0 0 8px;">けっか</h2>
+      <p style="margin:0 0 8px;font-weight:900;">たいむ：<span id="finalTime"></span></p>
+      <p style="margin:0 0 8px;font-weight:900;">せいかい：<span id="finalScore"></span></p>
+      <p class="best" id="bestAfter">さいこう たいむ：—</p>
+      <div class="row" style="margin-top:10px;">
+        <button class="primary" id="retryBtn">もういっかい</button>
+        <button id="backBtn">さいしょへ</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      ※ もんだいの ぶんは、ことばの いみを おぼえるための「ひんと」です。
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOTION = [
+  {id:"こいしい", label:"こいしい"},
+  {id:"あぜんとする", label:"あぜんとする"},
+  {id:"息をのむ", label:"いきをのむ（息をのむ）"},
+  {id:"うろたえる", label:"うろたえる"},
+  {id:"後ろめたい", label:"うしろめたい（後ろめたい）"},
+  {id:"とまどう", label:"とまどう"},
+  {id:"高ぶる", label:"たかぶる（高ぶる）"},
+  {id:"ほれぼれする", label:"ほれぼれする"},
+  {id:"ときめく", label:"ときめく"},
+  {id:"心をゆさぶる", label:"こころをゆさぶる（心をゆさぶる）"},
+  {id:"声がはずむ", label:"こえがはずむ（声がはずむ）"},
+  {id:"こみ上げる", label:"こみあげる（こみ上げる）"},
+  {id:"晴れやか", label:"はれやか（晴れやか）"},
+  {id:"ほほえましい", label:"ほほえましい"},
+  {id:"気が遠くなる", label:"きがとおくなる（気が遠くなる）"},
+  {id:"気が進まなくなる", label:"きがすすまなくなる（気が進まなくなる）"},
+  {id:"気が重い", label:"きがおもい（気が重い）"},
+  {id:"気が軽くなる", label:"きがかるくなる（気が軽くなる）"},
+  {id:"気をしずめる", label:"きをしずめる（気をしずめる）"},
+  {id:"心に留める", label:"こころにとめる（心に留める）"},
+  {id:"気に留める", label:"きにとめる（気に留める）"},
+  {id:"尊重する", label:"そんちょうする（尊重する）"},
+  {id:"くじける", label:"くじける"},
+  {id:"快い", label:"ここちいい（快い）"},
+  {id:"軽快", label:"けいかい（軽快）"},
+  {id:"とりはだが立つ", label:"とりはだがたつ（とりはだが立つ）"},
+  {id:"むねが高鳴る", label:"むねがたかなる（むねが高鳴る）"},
+  {id:"顔を赤らめる", label:"かおをあからめる（顔を赤らめる）"},
+  {id:"張りつめる", label:"はりつめる（張りつめる）"},
+  {id:"安らぐ", label:"やすらぐ（安らぐ）"},
+  {id:"苦々しい", label:"にがにがしい（苦々しい）"},
+  {id:"苦しい", label:"くるしい"},
+  {id:"切ない", label:"せつない（切ない）"},
+  {id:"しんみり", label:"しんみり"},
+  {id:"気の毒", label:"きのどく（気の毒）"},
+  {id:"息苦しい", label:"いきぐるしい（息苦しい）"},
+  {id:"いたたしい", label:"いたたしい"},
+  {id:"実感する", label:"じっかんする（実感する）"},
+  {id:"痛感する", label:"つうかんする（痛感する）"},
+  {id:"興味しんしん", label:"きょうみしんしん（興味しんしん）"},
+  {id:"背すじが寒くなる", label:"せすじがさむくなる（背すじが寒くなる）"},
+  {id:"息がつまる", label:"いきがつまる（息がつまる）"},
+  {id:"無我夢中", label:"むがむちゅう（無我夢中）"},
+  {id:"熱が冷める", label:"ねつがさめる（熱が冷める）"},
+  {id:"決意", label:"けつい（決意）"},
+  {id:"印象に残る", label:"いんしょうにのこる（印象に残る）"},
+  {id:"あこがれる", label:"あこがれる"}
+];
+
+const PERSON = [
+  {id:"気のいい", label:"きのいい（気のいい）"},
+  {id:"愛想がよい", label:"あいそがよい（愛想がよい）"},
+  {id:"あいきょうのある", label:"あいきょうのある"},
+  {id:"いさぎよい", label:"いさぎよい"},
+  {id:"じゅんすい", label:"じゅんすい"},
+  {id:"いせいがいい", label:"いせいがいい"},
+  {id:"びんかん", label:"びんかん"},
+  {id:"むじゃき", label:"むじゃき"},
+  {id:"情け深い", label:"なさけぶかい（情け深い）"},
+  {id:"はくじょう", label:"はくじょう"},
+  {id:"不器用", label:"ぶきよう（不器用）"},
+  {id:"強情", label:"ごうじょう（強情）"},
+  {id:"自由気まま", label:"じゆうきまま（自由気まま）"},
+  {id:"しんちょう", label:"しんちょう"},
+  {id:"きちょうめん", label:"きちょうめん"},
+  {id:"えんりょ深い", label:"えんりょぶかい（えんりょ深い）"},
+  {id:"ひかえめ", label:"ひかえめ"},
+  {id:"けんきょ", label:"けんきょ"},
+  {id:"おおらか", label:"おおらか"},
+  {id:"おっとり", label:"おっとり"},
+  {id:"冷静", label:"れいせい（冷静）"},
+  {id:"ときょうがある", label:"ときょうがある"},
+  {id:"堂々とした", label:"どうどうとした（堂々とした）"},
+  {id:"オーラのある", label:"おーらのある（オーラのある）"},
+  {id:"才能のある", label:"さいのうのある（才能のある）"},
+  {id:"すぐれた", label:"すぐれた"},
+  {id:"力量のある", label:"りきりょうのある（力量のある）"},
+  {id:"はつらつとした", label:"はつらつとした"}
+];
+
+const THING = [
+  {id:"良好", label:"りょうこう（良好）"},
+  {id:"良質", label:"りょうしつ（良質）"},
+  {id:"優良", label:"ゆうりょう（優良）"},
+  {id:"最適", label:"さいてき（最適）"},
+  {id:"良心的", label:"りょうしんてき（良心的）"},
+  {id:"とぼしい", label:"とぼしい"},
+  {id:"無数", label:"むすう（無数）"},
+  {id:"雑然", label:"ざつぜん（雑然）"},
+  {id:"整然", label:"せいぜん（整然）"},
+  {id:"古風", label:"こふう（古風）"},
+  {id:"こうかい", label:"こうかい"},
+  {id:"まさる", label:"まさる"},
+  {id:"引けをとらない", label:"ひけをとらない（引けをとらない）"},
+  {id:"いち、にを争う", label:"いち、にをあらそう（いち、にを争う）"},
+  {id:"評価が高い", label:"ひょうかがたかい（評価が高い）"},
+  {id:"みずみずしい", label:"みずみずしい"},
+  {id:"すがすがしい", label:"すがすがしい"},
+  {id:"目新しい", label:"めあたらしい（目新しい）"},
+  {id:"名高い", label:"なだかい（名高い）"},
+  {id:"評判がいい", label:"ひょうばんがいい（評判がいい）"},
+  {id:"価値がある", label:"かちがある（価値がある）"},
+  {id:"とてつもない", label:"とてつもない"},
+  {id:"強烈", label:"きょうれつ（強烈）"},
+  {id:"すみやか", label:"すみやか"},
+  {id:"しっくり", label:"しっくり"},
+  {id:"なじむ", label:"なじむ"},
+  {id:"順調", label:"じゅんちょう（順調）"},
+  {id:"自然", label:"しぜん（自然）"},
+  {id:"不自然", label:"ふしぜん（不自然）"},
+  {id:"重々しい", label:"おもおもしい（重々しい）"}
+];
+
+const CLUE = {
+  emotion: {
+    "こいしい":"あいたい人がいて、むねが きゅっと なる。",
+    "あぜんとする":"しんじられないことが おきて、ことばが でない。",
+    "息をのむ":"びっくりして、いっしゅん いきを とめてしまう。",
+    "うろたえる":"とつぜんのことで、あわてて しまう。",
+    "後ろめたい":"わるいことを した気がして、こころが おちつかない。",
+    "とまどう":"どうしたらいいか わからず、うごけない。",
+    "高ぶる":"うれしさや きんちょうで、きもちが もりあがる。",
+    "ほれぼれする":"すごく すてきで、みとれてしまう。",
+    "ときめく":"うれしくて、むねが どきどき する。",
+    "心をゆさぶる":"とても かんどうして、きもちが いっぱい うごく。",
+    "声がはずむ":"うれしくて、こえが あかるく なる。",
+    "こみ上げる":"なみだや うれしさが、わっと あがってくる。",
+    "晴れやか":"こころが すっきりして、あかるい きぶん。",
+    "ほほえましい":"みていると、にこにこ したくなる。",
+    "気が遠くなる":"びっくりしたり つかれて、くらっと しそう。",
+    "気が進まなくなる":"やりたくなくて、やる気が でない。",
+    "気が重い":"やだなあ…と おもって、きぶんが しずむ。",
+    "気が軽くなる":"ほっとして、きもちが らくに なる。",
+    "気をしずめる":"おちつくために、きもちを ととのえる。",
+    "心に留める":"わすれないように、しっかり おぼえておく。",
+    "気に留める":"ちょっと きになるので、おぼえておく。",
+    "尊重する":"あいての かんがえを たいせつに する。",
+    "くじける":"うまくいかず、やめたく なりそう。",
+    "快い":"きもちが よくて、ここちいい。",
+    "軽快":"からだも きぶんも かるく、すいすい。",
+    "とりはだが立つ":"こわい・びっくりで、ぞわっと する。",
+    "むねが高鳴る":"きんちょうで、こころが どきどき する。",
+    "顔を赤らめる":"はずかしくて、ほおが あかく なる。",
+    "張りつめる":"きんちょうで、ぴん！と した かんじ。",
+    "安らぐ":"ほっとして、こころが おちつく。",
+    "苦々しい":"なんだか くやしくて、もやもや する。",
+    "苦しい":"つらくて、こころが しんどい。",
+    "切ない":"かなしくて、むねが いたい かんじ。",
+    "しんみり":"しずかに、じん…と してくる。",
+    "気の毒":"かわいそうだな、と おもう。",
+    "息苦しい":"むねが つまるようで、しんどい。",
+    "いたたしい":"みていられないほど、つらそうで むねが いたい。",
+    "実感する":"ほんとうに そうだと、よく わかる。",
+    "痛感する":"とても つよく、そうだと わかる。",
+    "興味しんしん":"もっと しりたくて、わくわく している。",
+    "背すじが寒くなる":"こわくて、ぞっと する。",
+    "息がつまる":"きんちょうや びっくりで、いきが とまりそう。",
+    "無我夢中":"ほかのことを わすれて、むちゅうに なる。",
+    "熱が冷める":"さっきまでの やる気が なくなる。",
+    "決意":"よし、やるぞ！と きめる。",
+    "印象に残る":"わすれられず、こころに のこる。",
+    "あこがれる":"あんなふうに なりたい！と おもう。"
+  },
+  person: {
+    "気のいい":"やさしくて、いっしょにいると らく。",
+    "愛想がよい":"あいさつや えがおが じょうず。",
+    "あいきょうのある":"みんなに すきに なられる かんじ。",
+    "いさぎよい":"ぐずぐずせず、きっぱり している。",
+    "じゅんすい":"うそがなく、まっすぐ。",
+    "いせいがいい":"きちんとしていて、れいぎがある。",
+    "びんかん":"ちいさな へんかにも すぐ きづく。",
+    "むじゃき":"わるぎがなく、こどもみたい。",
+    "情け深い":"こまっている人に やさしい。",
+    "はくじょう":"れいえんで、なみだが でにくい かんじ。",
+    "不器用":"うまく できないことが おおい。",
+    "強情":"じぶんの いけんを かえない。",
+    "自由気まま":"じぶんの すきに うごく。",
+    "しんちょう":"よく かんがえて こうどうする。",
+    "きちょうめん":"きちんと せいりして、ていねい。",
+    "えんりょ深い":"ひかえめで、でしゃばらない。",
+    "ひかえめ":"めだとうと しない。",
+    "けんきょ":"じまんを しない。",
+    "おおらか":"こまかいことを きにしない。",
+    "おっとり":"のんびりして、あせらない。",
+    "冷静":"あわてず、おちついている。",
+    "ときょうがある":"こわがらずに やれる。",
+    "堂々とした":"じしんがあって、はっきりしている。",
+    "オーラのある":"なんだか すごそうな ふんいきが ある。",
+    "才能のある":"とくいなことが あって、うまい。",
+    "すぐれた":"とても よい。",
+    "力量のある":"じつりょくが ある。",
+    "はつらつとした":"げんきいっぱいで、いきいき。"
+  },
+  thing: {
+    "良好":"とても よい じょうたい。",
+    "良質":"しつが よくて、いい もの。",
+    "優良":"とくに よい。",
+    "最適":"いちばん ぴったり。",
+    "良心的":"だまさず、まじめで やさしい つくり。",
+    "とぼしい":"すくなくて、たりない。",
+    "無数":"かぞえきれないほど おおい。",
+    "雑然":"ごちゃごちゃ している。",
+    "整然":"きちんと ならんでいる。",
+    "古風":"むかしふう。",
+    "こうかい":"あとで「しまった」と おもう きもち。",
+    "まさる":"ほかより うえ。",
+    "引けをとらない":"まけない くらい いい。",
+    "いち、にを争う":"トップクラスで すごい。",
+    "評価が高い":"みんなから いいと おもわれている。",
+    "みずみずしい":"しんせんな かんじ。",
+    "すがすがしい":"さわやかで きもちいい。",
+    "目新しい":"はじめて みるようで あたらしい。",
+    "名高い":"ゆうめい。",
+    "評判がいい":"うわさで ほめられている。",
+    "価値がある":"だいじな いみが ある。",
+    "とてつもない":"ものすごく おおきい／すごい。",
+    "強烈":"とても つよい いんしょう。",
+    "すみやか":"はやく。",
+    "しっくり":"ぴったり している。",
+    "なじむ":"しぜんに あっている。",
+    "順調":"うまく すすんでいる。",
+    "自然":"むりがなく、ふつう。",
+    "不自然":"なんだか へん。",
+    "重々しい":"ずっしりして、かたい ふんいき。"
+  }
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pad2(n){ return String(n).padStart(2,"0"); }
+function formatMs(ms){
+  const m = Math.floor(ms/60000);
+  const s = Math.floor((ms%60000)/1000);
+  const r = ms%1000;
+  return `${pad2(m)}:${pad2(s)}.${String(r).padStart(3,"0")}`;
+}
+
+let deck = [];
+let idx = 0;
+let score = 0;
+let startAt = null;
+let timer = null;
+let locked = false;
+
+const BEST_KEY = "kotoba_quiz_best_ms_multi_v1";
+
+function getPool(){
+  const cat = document.getElementById("cat").value;
+  if(cat === "emotion") return EMOTION;
+  if(cat === "person")  return PERSON;
+  if(cat === "thing")   return THING;
+  return [...EMOTION, ...PERSON, ...THING];
+}
+
+function modeLabel(){
+  const cat = document.getElementById("cat").value;
+  if(cat==="emotion") return "しゅつだい：きもち（心情）";
+  if(cat==="person") return "しゅつだい：ひと（人物）";
+  if(cat==="thing") return "しゅつだい：もの（事物）";
+  return "しゅつだい：まぜる（ぜんぶ）";
+}
+
+function setPills(){
+  document.getElementById("modePill").textContent = modeLabel();
+  document.getElementById("progressPill").textContent =
+    startAt ? `もんだい ${idx+1}/${deck.length}` : "まだ はじめていません";
+}
+
+function setTimePill(){
+  document.getElementById("timePill").textContent =
+    startAt ? formatMs(Date.now() - startAt) : "00:00.000";
+}
+
+function loadBest(){
+  const v = localStorage.getItem(BEST_KEY);
+  if(!v) return null;
+  const ms = Number(v);
+  if(!Number.isFinite(ms)) return null;
+  return ms;
+}
+function showBest(){
+  const best = loadBest();
+  const txt = best==null ? "さいこう たいむ：—" : `さいこう たいむ：${formatMs(best)}`;
+  document.getElementById("bestLine").textContent = txt;
+  document.getElementById("bestAfter").textContent = txt;
+}
+function saveBestIfNeeded(ms){
+  const best = loadBest();
+  if(best==null || ms < best){
+    localStorage.setItem(BEST_KEY, String(ms));
+    return true;
+  }
+  return false;
+}
+
+function clueFor(item){
+  const cat = document.getElementById("cat").value;
+  if(cat==="mix"){
+    return CLUE.emotion[item.id] || CLUE.person[item.id] || CLUE.thing[item.id] || "このことばに あう ようすは？";
+  }
+  return (CLUE[cat] && CLUE[cat][item.id]) ? CLUE[cat][item.id] : "このことばに あう ようすは？";
+}
+
+function makeQuestion(item, allItems){
+  const clue = clueFor(item);
+  const others = shuffle(allItems.filter(x=>x.id!==item.id)).slice(0,3);
+  const options = shuffle([item, ...others]);
+  return { correct:item, clue, options };
+}
+
+let current = null;
+
+function renderQuestion(){
+  locked = false;
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+  msg.className = "msg";
+
+  setPills();
+  document.getElementById("score").textContent = String(score);
+  document.getElementById("remain").textContent = String(deck.length - idx);
+
+  const pool = getPool();
+  const item = deck[idx];
+  current = makeQuestion(item, pool);
+
+  document.getElementById("prompt").textContent = `【ようす】${current.clue}\n\nいちばん あう ことばは どれ？`;
+
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  current.options.forEach((opt, i)=>{
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.type = "button";
+    btn.dataset.id = opt.id;
+    btn.innerHTML = `${["A","B","C","D"][i]}. <strong>${opt.label}</strong><small>ここを おして こたえる</small>`;
+    btn.addEventListener("click", ()=>choose(opt.id, btn));
+    box.appendChild(btn);
+  });
+}
+
+function choose(chosenId, btnEl){
+  if(locked) return;
+  locked = true;
+
+  const buttons = Array.from(document.querySelectorAll(".choice"));
+  const correctId = current.correct.id;
+
+  buttons.forEach(b=>{
+    if(b.dataset.id === correctId) b.classList.add("correct");
+  });
+
+  const msg = document.getElementById("msg");
+  if(chosenId === correctId){
+    score++;
+    msg.textContent = "せいかい！";
+    msg.classList.add("good");
+  }else{
+    btnEl.classList.add("wrong");
+    msg.textContent = `ざんねん… せいかいは「${current.correct.label}」`;
+    msg.classList.add("bad");
+  }
+
+  document.getElementById("score").textContent = String(score);
+  document.getElementById("remain").textContent = String(deck.length - idx);
+
+  setTimeout(()=>{
+    idx++;
+    if(idx >= deck.length){
+      finish();
+    }else{
+      renderQuestion();
+    }
+  }, 750);
+}
+
+function start(){
+  const n = Number(document.getElementById("numQ").value);
+  const pool = getPool();
+  deck = shuffle(pool).slice(0, Math.min(n, pool.length));
+  idx = 0;
+  score = 0;
+
+  document.getElementById("preArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "none";
+  document.getElementById("quizArea").style.display = "block";
+
+  startAt = Date.now();
+  clearInterval(timer);
+  timer = setInterval(setTimePill, 30);
+
+  renderQuestion();
+  setTimePill();
+}
+
+function finish(){
+  clearInterval(timer);
+  timer = null;
+  const ms = Date.now() - startAt;
+
+  document.getElementById("quizArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "block";
+
+  document.getElementById("finalTime").textContent = formatMs(ms);
+  document.getElementById("finalScore").textContent = `${score}/${deck.length}`;
+
+  const improved = saveBestIfNeeded(ms);
+  showBest();
+  if(improved){
+    document.getElementById("bestAfter").textContent = `さいこう こうしん！ ${formatMs(ms)}`;
+  }
+
+  startAt = null;
+  setPills();
+  setTimePill();
+}
+
+function backToTop(){
+  clearInterval(timer);
+  timer = null;
+  startAt = null;
+
+  document.getElementById("quizArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "none";
+  document.getElementById("preArea").style.display = "block";
+
+  setPills();
+  setTimePill();
+  showBest();
+}
+
+document.getElementById("startBtn").addEventListener("click", start);
+document.getElementById("retryBtn").addEventListener("click", start);
+document.getElementById("backBtn").addEventListener("click", backToTop);
+document.getElementById("resetBestBtn").addEventListener("click", ()=>{
+  localStorage.removeItem(BEST_KEY);
+  showBest();
+  alert("きろくを けしました。");
+});
+document.getElementById("cat").addEventListener("change", ()=>setPills());
+
+showBest();
+setPills();
+setTimePill();
+</script>
+</body>
+</html>
+```
