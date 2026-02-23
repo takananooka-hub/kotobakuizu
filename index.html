@@ -1,602 +1,619 @@
+```html
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>はい・いいえ 立体クイズ（円柱/立方体/直方体/三角柱）</title>
+  <title>ことばクイズ 4たく（たいむ）</title>
   <style>
     :root{
-      --bg:#0b1020;
-      --card:#121a33;
-      --card2:#0f1730;
-      --text:#e9ecff;
-      --muted:#aab2ff;
-      --accent:#6ee7ff;
-      --accent2:#a78bfa;
-      --good:#34d399;
-      --bad:#fb7185;
-      --line:rgba(255,255,255,.12);
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --r:16px;
-      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      --bg1:#fff6d8;
+      --bg2:#e9f7ff;
+      --card:#ffffff;
+      --text:#1b2a3a;
+      --muted:#4a6078;
+      --pink:#ff7aa2;
+      --blue:#63b3ff;
+      --good:#23c483;
+      --bad:#ff5a5f;
     }
     body{
       margin:0;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
-                  radial-gradient(900px 500px at 80% 10%, rgba(167,139,250,.18), transparent 55%),
-                  var(--bg);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
       color:var(--text);
-      font-family:var(--font);
     }
-    .wrap{max-width:980px; margin:24px auto; padding:0 16px;}
-    h1{font-size:22px; margin:0 0 6px;}
-    .sub{color:var(--muted); font-size:14px; margin:0 0 16px;}
-    .grid{display:grid; gap:14px;}
-    @media(min-width:860px){
-      .grid{grid-template-columns: 1.2fr .8fr;}
-    }
+    .wrap{max-width:960px;margin:0 auto;padding:18px;}
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+      background:var(--card);
+      border:2px solid rgba(99,179,255,.35);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 12px 24px rgba(0,0,0,.08);
     }
-    .card .hd{
-      padding:14px 16px;
-      border-bottom:1px solid var(--line);
-      background: linear-gradient(90deg, rgba(110,231,255,.10), rgba(167,139,250,.10));
-    }
-    .card .bd{padding:14px 16px;}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-    input[type="text"]{
-      flex:1;
-      min-width:240px;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(10,14,28,.6);
-      color:var(--text);
-      outline:none;
-    }
-    input[type="text"]::placeholder{color: rgba(233,236,255,.55);}
-    button{
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:11px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      transition: transform .05s ease, background .15s ease, border-color .15s ease;
-      user-select:none;
-    }
-    button:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.26);}
-    button:active{transform: translateY(1px);}
-    button.primary{
-      background: rgba(110,231,255,.16);
-      border-color: rgba(110,231,255,.35);
-    }
-    button.primary:hover{background: rgba(110,231,255,.22);}
-    button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-    }
+    h1{font-size:20px;margin:0 0 10px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     .pill{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      font-size:13px;
-      color: var(--muted);
+      padding:6px 10px;border-radius:999px;
+      background:rgba(99,179,255,.18);
+      border:1px solid rgba(99,179,255,.35);
+      color:var(--muted);font-size:12px;
+      font-weight:700;
     }
-    .kpi{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
-    .log{
-      max-height:320px;
-      overflow:auto;
-      background: rgba(0,0,0,.18);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
-      font-size:14px;
-      line-height:1.5;
+    button{
+      cursor:pointer;border:0;border-radius:14px;
+      padding:10px 14px;font-weight:900;
+      background:rgba(255,122,162,.20);
+      color:var(--text);
+      border:2px solid rgba(255,122,162,.35);
     }
-    .msg{padding:8px 10px; border-radius:12px; margin:8px 0;}
-    .q{background: rgba(167,139,250,.12); border:1px solid rgba(167,139,250,.22);}
-    .a{background: rgba(110,231,255,.10); border:1px solid rgba(110,231,255,.22);}
-    .sys{background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:rgba(233,236,255,.9);}
-    .good{color:var(--good); font-weight:700;}
-    .bad{color:var(--bad); font-weight:700;}
-
-    .choices{display:grid; gap:10px; grid-template-columns: repeat(2, 1fr);}
+    button:hover{background:rgba(255,122,162,.28);}
+    button.primary{
+      background:rgba(99,179,255,.25);
+      border-color:rgba(99,179,255,.45);
+    }
+    button.primary:hover{background:rgba(99,179,255,.33);}
+    button:disabled{opacity:.55;cursor:not-allowed;}
+    select{
+      background:#fff; color:var(--text);
+      border:2px solid rgba(99,179,255,.35);
+      border-radius:12px; padding:7px 10px; font-weight:800;
+    }
+    .hr{height:2px;background:rgba(99,179,255,.22);margin:12px 0;}
+    .qbox{margin-top:12px;}
+    .prompt{
+      font-size:18px;line-height:1.6;margin:0 0 10px;
+      white-space:pre-wrap;
+      font-weight:800;
+    }
+    .choices{display:grid;grid-template-columns:1fr;gap:10px;}
+    @media (min-width:720px){ .choices{grid-template-columns:1fr 1fr;} }
     .choice{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      padding:12px 12px;border-radius:16px;
+      background:rgba(99,179,255,.10);
+      border:2px solid rgba(99,179,255,.18);
+      text-align:left;
     }
-    .choice svg{width:56px; height:56px; flex:0 0 56px;}
-    .choice .name{font-weight:700;}
-    .choice .desc{color:var(--muted); font-size:12px; margin-top:2px;}
-    .choice button{margin-left:auto;}
-    .hint{
-      margin-top:10px;
-      font-size:13px;
-      color: rgba(233,236,255,.85);
-      background: rgba(255,255,255,.04);
-      border:1px dashed rgba(255,255,255,.18);
-      padding:10px 12px;
-      border-radius:14px;
+    .choice small{display:block;color:var(--muted);font-weight:700;margin-top:4px;}
+    .choice.correct{border-color:rgba(35,196,131,.75);background:rgba(35,196,131,.12);}
+    .choice.wrong{border-color:rgba(255,90,95,.75);background:rgba(255,90,95,.10);}
+    .status{
+      margin-top:10px;color:var(--muted);font-size:13px;
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      font-weight:900;
     }
-    .mini{font-size:12px; color: rgba(233,236,255,.70);}
-    .hr{height:1px; background: var(--line); margin:12px 0;}
-    .footer{color: rgba(233,236,255,.70); font-size:12px; margin-top:10px;}
-    .tag{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; color:var(--muted);}
+    .msg{margin-top:10px;font-weight:1000;}
+    .msg.good{color:var(--good);}
+    .msg.bad{color:var(--bad);}
+    .best,.footer{color:var(--muted);font-size:12px;line-height:1.5;font-weight:700;}
+    .list{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12px;font-weight:700;}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>はい・いいえ 立体クイズ</h1>
-    <p class="sub">質問を3回まで入力 → 「はい/いいえ」で答えが返る → どの立体か当てよう（円柱 / 立方体 / 直方体 / 三角柱）</p>
+<div class="wrap">
+  <div class="card">
+    <h1>ことばクイズ 4たく（たいむあたっく）</h1>
 
-    <div class="grid">
-      <section class="card">
-        <div class="hd">
-          <div class="row" style="justify-content:space-between;">
-            <div class="pill" id="statusPill">準備中…</div>
-            <div class="row">
-              <button id="newBtn" class="primary">はじめる</button>
-              <button id="resetBtn">リセット</button>
-            </div>
-          </div>
-          <div class="kpi">
-            <span class="tag">質問回数: <b id="qCount">0</b>/3</span>
-            <span class="tag">状態: <b id="phase">未開始</b></span>
-          </div>
-        </div>
+    <div class="row" style="justify-content:space-between;">
+      <div class="row">
+        <span class="pill" id="modePill">しゅつだい：きもちのことば</span>
+        <span class="pill" id="progressPill">まだ はじめていません</span>
+        <span class="pill" id="timePill">00:00.000</span>
+      </div>
+      <div class="row">
+        <label class="pill">ジャンル：
+          <select id="cat">
+            <option value="emotion" selected>きもち（心情）</option>
+            <option value="person">ひと（人物）</option>
+            <option value="thing">もの（事物）</option>
+            <option value="mix">まぜる（ぜんぶ）</option>
+          </select>
+        </label>
+        <label class="pill">もんだい すう：
+          <select id="numQ">
+            <option>5</option>
+            <option selected>10</option>
+            <option>15</option>
+            <option>20</option>
+            <option>25</option>
+          </select>
+        </label>
+        <button class="primary" id="startBtn">はじめる</button>
+        <button id="resetBestBtn" title="きろくを けします">きろく りせっと</button>
+      </div>
+    </div>
 
-        <div class="bd">
-          <div class="row">
-            <input id="qInput" type="text" placeholder="例：底面は丸ですか / 面は6こですか / 頂点は8こですか" disabled />
-            <button id="askBtn" class="primary" disabled>きく</button>
-          </div>
+    <div class="hr"></div>
 
-          <div class="hint">
-            <div><b>対応している質問の例</b></div>
-            <div class="mini">
-              ・底面は丸（円）ですか / 底面は三角形ですか / 底面は正方形ですか / 底面は長方形ですか<br/>
-              ・曲面がありますか（面は曲面ですか）<br/>
-              ・面は6こですか / 頂点は8こですか / 辺は12本ですか（数字は「6」「8」「12」など）<br/>
-              ・辺の長さは全部同じですか
-            </div>
-          </div>
+    <div id="preArea">
+      <p class="best" id="bestLine">さいこう たいむ：—</p>
+      <p class="best">やりかた：ぶん（ようす）をよんで、いちばん あう「ことば」を えらびます。おわると たいむが でます。</p>
+      <ul class="list">
+        <li>ジャンル（きもち／ひと／もの／まぜる）を えらべます。</li>
+        <li>まちがえても つぎへ すすみます。</li>
+      </ul>
+    </div>
 
-          <div class="hr"></div>
-          <div class="log" id="log"></div>
+    <div class="qbox" id="quizArea" style="display:none;">
+      <p class="prompt" id="prompt"></p>
+      <div class="choices" id="choices"></div>
+      <div class="msg" id="msg"></div>
+      <div class="status">
+        <div>せいかい：<span id="score">0</span></div>
+        <div>のこり：<span id="remain">0</span></div>
+      </div>
+    </div>
 
-          <div class="footer">
-            ※「わからない」判定になったら、別の聞き方で試してみてください（例：数字を入れる、底面/曲面の言い方を変える）。
-          </div>
-        </div>
-      </section>
+    <div class="qbox" id="resultArea" style="display:none;">
+      <h2 style="font-size:18px;margin:0 0 8px;">けっか</h2>
+      <p style="margin:0 0 8px;font-weight:900;">たいむ：<span id="finalTime"></span></p>
+      <p style="margin:0 0 8px;font-weight:900;">せいかい：<span id="finalScore"></span></p>
+      <p class="best" id="bestAfter">さいこう たいむ：—</p>
+      <div class="row" style="margin-top:10px;">
+        <button class="primary" id="retryBtn">もういっかい</button>
+        <button id="backBtn">さいしょへ</button>
+      </div>
+    </div>
 
-      <aside class="card">
-        <div class="hd">
-          <div style="font-weight:800;">どれだと思う？（クリックして答え）</div>
-          <div class="mini" id="guessHelp">「はじめる」を押すと、いつでも答えられます（本当は3回質問してからがおすすめ）。</div>
-        </div>
-        <div class="bd">
-          <div class="choices" id="choices"></div>
-        </div>
-      </aside>
+    <div class="footer">
+      ※ もんだいの ぶんは、ことばの いみを おぼえるための「ひんと」です。
     </div>
   </div>
+</div>
 
 <script>
-(() => {
-  // ===== データ（立体の特徴） =====
-  const SHAPES = [
-    {
-      key: "cylinder",
-      name: "円柱",
-      // 特徴
-      faces: 3,
-      vertices: 0,
-      edges: 2,          // ふち（円周）を「辺」として数える扱い
-      hasCurvedSurface: true,
-      base: "circle",    // 底面
-      allEdgesEqual: null, // 直線の辺がないので判定は「いいえ」に寄せない（null=どちらでもない）
-      // 表示用
-      desc: "底面は円。横は曲面。",
-      svg: cylinderSVG()
-    },
-    {
-      key: "cube",
-      name: "立方体",
-      faces: 6,
-      vertices: 8,
-      edges: 12,
-      hasCurvedSurface: false,
-      base: "square",
-      allEdgesEqual: true,
-      desc: "面は正方形6こ。辺は全部同じ長さ。",
-      svg: cubeSVG()
-    },
-    {
-      key: "rectPrism",
-      name: "直方体",
-      faces: 6,
-      vertices: 8,
-      edges: 12,
-      hasCurvedSurface: false,
-      base: "rectangle",
-      allEdgesEqual: false,
-      desc: "面は長方形6こ。辺は全部同じではない。",
-      svg: rectPrismSVG()
-    },
-    {
-      key: "triPrism",
-      name: "三角柱",
-      faces: 5,
-      vertices: 6,
-      edges: 9,
-      hasCurvedSurface: false,
-      base: "triangle",
-      allEdgesEqual: false,
-      desc: "底面は三角形。横の面は長方形3こ。",
-      svg: triPrismSVG()
-    }
-  ];
+const EMOTION = [
+  {id:"こいしい", label:"こいしい"},
+  {id:"あぜんとする", label:"あぜんとする"},
+  {id:"息をのむ", label:"いきをのむ（息をのむ）"},
+  {id:"うろたえる", label:"うろたえる"},
+  {id:"後ろめたい", label:"うしろめたい（後ろめたい）"},
+  {id:"とまどう", label:"とまどう"},
+  {id:"高ぶる", label:"たかぶる（高ぶる）"},
+  {id:"ほれぼれする", label:"ほれぼれする"},
+  {id:"ときめく", label:"ときめく"},
+  {id:"心をゆさぶる", label:"こころをゆさぶる（心をゆさぶる）"},
+  {id:"声がはずむ", label:"こえがはずむ（声がはずむ）"},
+  {id:"こみ上げる", label:"こみあげる（こみ上げる）"},
+  {id:"晴れやか", label:"はれやか（晴れやか）"},
+  {id:"ほほえましい", label:"ほほえましい"},
+  {id:"気が遠くなる", label:"きがとおくなる（気が遠くなる）"},
+  {id:"気が進まなくなる", label:"きがすすまなくなる（気が進まなくなる）"},
+  {id:"気が重い", label:"きがおもい（気が重い）"},
+  {id:"気が軽くなる", label:"きがかるくなる（気が軽くなる）"},
+  {id:"気をしずめる", label:"きをしずめる（気をしずめる）"},
+  {id:"心に留める", label:"こころにとめる（心に留める）"},
+  {id:"気に留める", label:"きにとめる（気に留める）"},
+  {id:"尊重する", label:"そんちょうする（尊重する）"},
+  {id:"くじける", label:"くじける"},
+  {id:"快い", label:"ここちいい（快い）"},
+  {id:"軽快", label:"けいかい（軽快）"},
+  {id:"とりはだが立つ", label:"とりはだがたつ（とりはだが立つ）"},
+  {id:"むねが高鳴る", label:"むねがたかなる（むねが高鳴る）"},
+  {id:"顔を赤らめる", label:"かおをあからめる（顔を赤らめる）"},
+  {id:"張りつめる", label:"はりつめる（張りつめる）"},
+  {id:"安らぐ", label:"やすらぐ（安らぐ）"},
+  {id:"苦々しい", label:"にがにがしい（苦々しい）"},
+  {id:"苦しい", label:"くるしい"},
+  {id:"切ない", label:"せつない（切ない）"},
+  {id:"しんみり", label:"しんみり"},
+  {id:"気の毒", label:"きのどく（気の毒）"},
+  {id:"息苦しい", label:"いきぐるしい（息苦しい）"},
+  {id:"いたたしい", label:"いたたしい"},
+  {id:"実感する", label:"じっかんする（実感する）"},
+  {id:"痛感する", label:"つうかんする（痛感する）"},
+  {id:"興味しんしん", label:"きょうみしんしん（興味しんしん）"},
+  {id:"背すじが寒くなる", label:"せすじがさむくなる（背すじが寒くなる）"},
+  {id:"息がつまる", label:"いきがつまる（息がつまる）"},
+  {id:"無我夢中", label:"むがむちゅう（無我夢中）"},
+  {id:"熱が冷める", label:"ねつがさめる（熱が冷める）"},
+  {id:"決意", label:"けつい（決意）"},
+  {id:"印象に残る", label:"いんしょうにのこる（印象に残る）"},
+  {id:"あこがれる", label:"あこがれる"}
+];
 
-  // ===== 状態 =====
-  let secret = null;
-  let qCount = 0;
-  let started = false;
-  let finished = false;
+const PERSON = [
+  {id:"気のいい", label:"きのいい（気のいい）"},
+  {id:"愛想がよい", label:"あいそがよい（愛想がよい）"},
+  {id:"あいきょうのある", label:"あいきょうのある"},
+  {id:"いさぎよい", label:"いさぎよい"},
+  {id:"じゅんすい", label:"じゅんすい"},
+  {id:"いせいがいい", label:"いせいがいい"},
+  {id:"びんかん", label:"びんかん"},
+  {id:"むじゃき", label:"むじゃき"},
+  {id:"情け深い", label:"なさけぶかい（情け深い）"},
+  {id:"はくじょう", label:"はくじょう"},
+  {id:"不器用", label:"ぶきよう（不器用）"},
+  {id:"強情", label:"ごうじょう（強情）"},
+  {id:"自由気まま", label:"じゆうきまま（自由気まま）"},
+  {id:"しんちょう", label:"しんちょう"},
+  {id:"きちょうめん", label:"きちょうめん"},
+  {id:"えんりょ深い", label:"えんりょぶかい（えんりょ深い）"},
+  {id:"ひかえめ", label:"ひかえめ"},
+  {id:"けんきょ", label:"けんきょ"},
+  {id:"おおらか", label:"おおらか"},
+  {id:"おっとり", label:"おっとり"},
+  {id:"冷静", label:"れいせい（冷静）"},
+  {id:"ときょうがある", label:"ときょうがある"},
+  {id:"堂々とした", label:"どうどうとした（堂々とした）"},
+  {id:"オーラのある", label:"おーらのある（オーラのある）"},
+  {id:"才能のある", label:"さいのうのある（才能のある）"},
+  {id:"すぐれた", label:"すぐれた"},
+  {id:"力量のある", label:"りきりょうのある（力量のある）"},
+  {id:"はつらつとした", label:"はつらつとした"}
+];
 
-  // ===== DOM =====
-  const el = (id) => document.getElementById(id);
-  const logEl = el("log");
-  const qInput = el("qInput");
-  const askBtn = el("askBtn");
-  const newBtn = el("newBtn");
-  const resetBtn = el("resetBtn");
-  const qCountEl = el("qCount");
-  const phaseEl = el("phase");
-  const statusPill = el("statusPill");
-  const choicesEl = el("choices");
-  const guessHelp = el("guessHelp");
+const THING = [
+  {id:"良好", label:"りょうこう（良好）"},
+  {id:"良質", label:"りょうしつ（良質）"},
+  {id:"優良", label:"ゆうりょう（優良）"},
+  {id:"最適", label:"さいてき（最適）"},
+  {id:"良心的", label:"りょうしんてき（良心的）"},
+  {id:"とぼしい", label:"とぼしい"},
+  {id:"無数", label:"むすう（無数）"},
+  {id:"雑然", label:"ざつぜん（雑然）"},
+  {id:"整然", label:"せいぜん（整然）"},
+  {id:"古風", label:"こふう（古風）"},
+  {id:"こうかい", label:"こうかい"},
+  {id:"まさる", label:"まさる"},
+  {id:"引けをとらない", label:"ひけをとらない（引けをとらない）"},
+  {id:"いち、にを争う", label:"いち、にをあらそう（いち、にを争う）"},
+  {id:"評価が高い", label:"ひょうかがたかい（評価が高い）"},
+  {id:"みずみずしい", label:"みずみずしい"},
+  {id:"すがすがしい", label:"すがすがしい"},
+  {id:"目新しい", label:"めあたらしい（目新しい）"},
+  {id:"名高い", label:"なだかい（名高い）"},
+  {id:"評判がいい", label:"ひょうばんがいい（評判がいい）"},
+  {id:"価値がある", label:"かちがある（価値がある）"},
+  {id:"とてつもない", label:"とてつもない"},
+  {id:"強烈", label:"きょうれつ（強烈）"},
+  {id:"すみやか", label:"すみやか"},
+  {id:"しっくり", label:"しっくり"},
+  {id:"なじむ", label:"なじむ"},
+  {id:"順調", label:"じゅんちょう（順調）"},
+  {id:"自然", label:"しぜん（自然）"},
+  {id:"不自然", label:"ふしぜん（不自然）"},
+  {id:"重々しい", label:"おもおもしい（重々しい）"}
+];
 
-  // ===== 初期表示：選択肢 =====
-  renderChoices();
+const CLUE = {
+  emotion: {
+    "こいしい":"あいたい人がいて、むねが きゅっと なる。",
+    "あぜんとする":"しんじられないことが おきて、ことばが でない。",
+    "息をのむ":"びっくりして、いっしゅん いきを とめてしまう。",
+    "うろたえる":"とつぜんのことで、あわてて しまう。",
+    "後ろめたい":"わるいことを した気がして、こころが おちつかない。",
+    "とまどう":"どうしたらいいか わからず、うごけない。",
+    "高ぶる":"うれしさや きんちょうで、きもちが もりあがる。",
+    "ほれぼれする":"すごく すてきで、みとれてしまう。",
+    "ときめく":"うれしくて、むねが どきどき する。",
+    "心をゆさぶる":"とても かんどうして、きもちが いっぱい うごく。",
+    "声がはずむ":"うれしくて、こえが あかるく なる。",
+    "こみ上げる":"なみだや うれしさが、わっと あがってくる。",
+    "晴れやか":"こころが すっきりして、あかるい きぶん。",
+    "ほほえましい":"みていると、にこにこ したくなる。",
+    "気が遠くなる":"びっくりしたり つかれて、くらっと しそう。",
+    "気が進まなくなる":"やりたくなくて、やる気が でない。",
+    "気が重い":"やだなあ…と おもって、きぶんが しずむ。",
+    "気が軽くなる":"ほっとして、きもちが らくに なる。",
+    "気をしずめる":"おちつくために、きもちを ととのえる。",
+    "心に留める":"わすれないように、しっかり おぼえておく。",
+    "気に留める":"ちょっと きになるので、おぼえておく。",
+    "尊重する":"あいての かんがえを たいせつに する。",
+    "くじける":"うまくいかず、やめたく なりそう。",
+    "快い":"きもちが よくて、ここちいい。",
+    "軽快":"からだも きぶんも かるく、すいすい。",
+    "とりはだが立つ":"こわい・びっくりで、ぞわっと する。",
+    "むねが高鳴る":"きんちょうで、こころが どきどき する。",
+    "顔を赤らめる":"はずかしくて、ほおが あかく なる。",
+    "張りつめる":"きんちょうで、ぴん！と した かんじ。",
+    "安らぐ":"ほっとして、こころが おちつく。",
+    "苦々しい":"なんだか くやしくて、もやもや する。",
+    "苦しい":"つらくて、こころが しんどい。",
+    "切ない":"かなしくて、むねが いたい かんじ。",
+    "しんみり":"しずかに、じん…と してくる。",
+    "気の毒":"かわいそうだな、と おもう。",
+    "息苦しい":"むねが つまるようで、しんどい。",
+    "いたたしい":"みていられないほど、つらそうで むねが いたい。",
+    "実感する":"ほんとうに そうだと、よく わかる。",
+    "痛感する":"とても つよく、そうだと わかる。",
+    "興味しんしん":"もっと しりたくて、わくわく している。",
+    "背すじが寒くなる":"こわくて、ぞっと する。",
+    "息がつまる":"きんちょうや びっくりで、いきが とまりそう。",
+    "無我夢中":"ほかのことを わすれて、むちゅうに なる。",
+    "熱が冷める":"さっきまでの やる気が なくなる。",
+    "決意":"よし、やるぞ！と きめる。",
+    "印象に残る":"わすれられず、こころに のこる。",
+    "あこがれる":"あんなふうに なりたい！と おもう。"
+  },
+  person: {
+    "気のいい":"やさしくて、いっしょにいると らく。",
+    "愛想がよい":"あいさつや えがおが じょうず。",
+    "あいきょうのある":"みんなに すきに なられる かんじ。",
+    "いさぎよい":"ぐずぐずせず、きっぱり している。",
+    "じゅんすい":"うそがなく、まっすぐ。",
+    "いせいがいい":"きちんとしていて、れいぎがある。",
+    "びんかん":"ちいさな へんかにも すぐ きづく。",
+    "むじゃき":"わるぎがなく、こどもみたい。",
+    "情け深い":"こまっている人に やさしい。",
+    "はくじょう":"れいえんで、なみだが でにくい かんじ。",
+    "不器用":"うまく できないことが おおい。",
+    "強情":"じぶんの いけんを かえない。",
+    "自由気まま":"じぶんの すきに うごく。",
+    "しんちょう":"よく かんがえて こうどうする。",
+    "きちょうめん":"きちんと せいりして、ていねい。",
+    "えんりょ深い":"ひかえめで、でしゃばらない。",
+    "ひかえめ":"めだとうと しない。",
+    "けんきょ":"じまんを しない。",
+    "おおらか":"こまかいことを きにしない。",
+    "おっとり":"のんびりして、あせらない。",
+    "冷静":"あわてず、おちついている。",
+    "ときょうがある":"こわがらずに やれる。",
+    "堂々とした":"じしんがあって、はっきりしている。",
+    "オーラのある":"なんだか すごそうな ふんいきが ある。",
+    "才能のある":"とくいなことが あって、うまい。",
+    "すぐれた":"とても よい。",
+    "力量のある":"じつりょくが ある。",
+    "はつらつとした":"げんきいっぱいで、いきいき。"
+  },
+  thing: {
+    "良好":"とても よい じょうたい。",
+    "良質":"しつが よくて、いい もの。",
+    "優良":"とくに よい。",
+    "最適":"いちばん ぴったり。",
+    "良心的":"だまさず、まじめで やさしい つくり。",
+    "とぼしい":"すくなくて、たりない。",
+    "無数":"かぞえきれないほど おおい。",
+    "雑然":"ごちゃごちゃ している。",
+    "整然":"きちんと ならんでいる。",
+    "古風":"むかしふう。",
+    "こうかい":"あとで「しまった」と おもう きもち。",
+    "まさる":"ほかより うえ。",
+    "引けをとらない":"まけない くらい いい。",
+    "いち、にを争う":"トップクラスで すごい。",
+    "評価が高い":"みんなから いいと おもわれている。",
+    "みずみずしい":"しんせんな かんじ。",
+    "すがすがしい":"さわやかで きもちいい。",
+    "目新しい":"はじめて みるようで あたらしい。",
+    "名高い":"ゆうめい。",
+    "評判がいい":"うわさで ほめられている。",
+    "価値がある":"だいじな いみが ある。",
+    "とてつもない":"ものすごく おおきい／すごい。",
+    "強烈":"とても つよい いんしょう。",
+    "すみやか":"はやく。",
+    "しっくり":"ぴったり している。",
+    "なじむ":"しぜんに あっている。",
+    "順調":"うまく すすんでいる。",
+    "自然":"むりがなく、ふつう。",
+    "不自然":"なんだか へん。",
+    "重々しい":"ずっしりして、かたい ふんいき。"
+  }
+};
 
-  // ===== イベント =====
-  newBtn.addEventListener("click", () => startGame());
-  resetBtn.addEventListener("click", () => resetGame());
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pad2(n){ return String(n).padStart(2,"0"); }
+function formatMs(ms){
+  const m = Math.floor(ms/60000);
+  const s = Math.floor((ms%60000)/1000);
+  const r = ms%1000;
+  return `${pad2(m)}:${pad2(s)}.${String(r).padStart(3,"0")}`;
+}
 
-  askBtn.addEventListener("click", () => askQuestion());
-  qInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") askQuestion();
+let deck = [];
+let idx = 0;
+let score = 0;
+let startAt = null;
+let timer = null;
+let locked = false;
+
+const BEST_KEY = "kotoba_quiz_best_ms_multi_v1";
+
+function getPool(){
+  const cat = document.getElementById("cat").value;
+  if(cat === "emotion") return EMOTION;
+  if(cat === "person")  return PERSON;
+  if(cat === "thing")   return THING;
+  return [...EMOTION, ...PERSON, ...THING];
+}
+
+function modeLabel(){
+  const cat = document.getElementById("cat").value;
+  if(cat==="emotion") return "しゅつだい：きもち（心情）";
+  if(cat==="person") return "しゅつだい：ひと（人物）";
+  if(cat==="thing") return "しゅつだい：もの（事物）";
+  return "しゅつだい：まぜる（ぜんぶ）";
+}
+
+function setPills(){
+  document.getElementById("modePill").textContent = modeLabel();
+  document.getElementById("progressPill").textContent =
+    startAt ? `もんだい ${idx+1}/${deck.length}` : "まだ はじめていません";
+}
+
+function setTimePill(){
+  document.getElementById("timePill").textContent =
+    startAt ? formatMs(Date.now() - startAt) : "00:00.000";
+}
+
+function loadBest(){
+  const v = localStorage.getItem(BEST_KEY);
+  if(!v) return null;
+  const ms = Number(v);
+  if(!Number.isFinite(ms)) return null;
+  return ms;
+}
+function showBest(){
+  const best = loadBest();
+  const txt = best==null ? "さいこう たいむ：—" : `さいこう たいむ：${formatMs(best)}`;
+  document.getElementById("bestLine").textContent = txt;
+  document.getElementById("bestAfter").textContent = txt;
+}
+function saveBestIfNeeded(ms){
+  const best = loadBest();
+  if(best==null || ms < best){
+    localStorage.setItem(BEST_KEY, String(ms));
+    return true;
+  }
+  return false;
+}
+
+function clueFor(item){
+  const cat = document.getElementById("cat").value;
+  if(cat==="mix"){
+    return CLUE.emotion[item.id] || CLUE.person[item.id] || CLUE.thing[item.id] || "このことばに あう ようすは？";
+  }
+  return (CLUE[cat] && CLUE[cat][item.id]) ? CLUE[cat][item.id] : "このことばに あう ようすは？";
+}
+
+function makeQuestion(item, allItems){
+  const clue = clueFor(item);
+  const others = shuffle(allItems.filter(x=>x.id!==item.id)).slice(0,3);
+  const options = shuffle([item, ...others]);
+  return { correct:item, clue, options };
+}
+
+let current = null;
+
+function renderQuestion(){
+  locked = false;
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+  msg.className = "msg";
+
+  setPills();
+  document.getElementById("score").textContent = String(score);
+  document.getElementById("remain").textContent = String(deck.length - idx);
+
+  const pool = getPool();
+  const item = deck[idx];
+  current = makeQuestion(item, pool);
+
+  document.getElementById("prompt").textContent = `【ようす】${current.clue}\n\nいちばん あう ことばは どれ？`;
+
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  current.options.forEach((opt, i)=>{
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.type = "button";
+    btn.dataset.id = opt.id;
+    btn.innerHTML = `${["A","B","C","D"][i]}. <strong>${opt.label}</strong><small>ここを おして こたえる</small>`;
+    btn.addEventListener("click", ()=>choose(opt.id, btn));
+    box.appendChild(btn);
+  });
+}
+
+function choose(chosenId, btnEl){
+  if(locked) return;
+  locked = true;
+
+  const buttons = Array.from(document.querySelectorAll(".choice"));
+  const correctId = current.correct.id;
+
+  buttons.forEach(b=>{
+    if(b.dataset.id === correctId) b.classList.add("correct");
   });
 
-  function startGame(){
-    secret = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-    qCount = 0;
-    started = true;
-    finished = false;
-    logEl.innerHTML = "";
-    systemMsg("4つの立体から1つをえらびました。質問を入力してね（3回まで）。");
-    updateUI();
+  const msg = document.getElementById("msg");
+  if(chosenId === correctId){
+    score++;
+    msg.textContent = "せいかい！";
+    msg.classList.add("good");
+  }else{
+    btnEl.classList.add("wrong");
+    msg.textContent = `ざんねん… せいかいは「${current.correct.label}」`;
+    msg.classList.add("bad");
   }
 
-  function resetGame(){
-    secret = null;
-    qCount = 0;
-    started = false;
-    finished = false;
-    logEl.innerHTML = "";
-    systemMsg("リセットしました。「はじめる」を押してね。");
-    updateUI();
-  }
+  document.getElementById("score").textContent = String(score);
+  document.getElementById("remain").textContent = String(deck.length - idx);
 
-  function endQuestions(){
-    finished = true;
-    systemMsg("質問はここまで。どれだと思う？右の立体をクリックして答えてね。");
-    updateUI();
-  }
-
-  function askQuestion(){
-    if (!started || finished) return;
-    const q = (qInput.value || "").trim();
-    if (!q) return;
-
-    qInput.value = "";
-    addMsg("あなた: " + q, "q");
-
-    const { understood, answer, reason } = decideYesNo(q, secret);
-    if (!understood){
-      addMsg("アプリ: わかりません（別の聞き方でおねがいします）", "a");
-      addMsg("ヒント: " + reason, "sys");
-      return;
+  setTimeout(()=>{
+    idx++;
+    if(idx >= deck.length){
+      finish();
+    }else{
+      renderQuestion();
     }
+  }, 750);
+}
 
-    addMsg("アプリ: " + (answer ? "はい" : "いいえ"), "a");
-    qCount++;
-    updateUI();
+function start(){
+  const n = Number(document.getElementById("numQ").value);
+  const pool = getPool();
+  deck = shuffle(pool).slice(0, Math.min(n, pool.length));
+  idx = 0;
+  score = 0;
 
-    if (qCount >= 3){
-      endQuestions();
-    }
+  document.getElementById("preArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "none";
+  document.getElementById("quizArea").style.display = "block";
+
+  startAt = Date.now();
+  clearInterval(timer);
+  timer = setInterval(setTimePill, 30);
+
+  renderQuestion();
+  setTimePill();
+}
+
+function finish(){
+  clearInterval(timer);
+  timer = null;
+  const ms = Date.now() - startAt;
+
+  document.getElementById("quizArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "block";
+
+  document.getElementById("finalTime").textContent = formatMs(ms);
+  document.getElementById("finalScore").textContent = `${score}/${deck.length}`;
+
+  const improved = saveBestIfNeeded(ms);
+  showBest();
+  if(improved){
+    document.getElementById("bestAfter").textContent = `さいこう こうしん！ ${formatMs(ms)}`;
   }
 
-  // ===== 判定（超かんたん日本語パーサ）=====
-  function decideYesNo(question, shape){
-    const q = normalize(question);
+  startAt = null;
+  setPills();
+  setTimePill();
+}
 
-    // 1) 底面（丸/円/三角/正方形/長方形）
-    if (includesAny(q, ["底面", "そこ面", "下の面", "したの面"])) {
-      if (includesAny(q, ["丸", "まる", "円", "えん"])) {
-        return ok(shape.base === "circle", "「底面は丸（円）ですか」の形で聞いてみてね。");
-      }
-      if (includesAny(q, ["三角", "さんかく"])) {
-        return ok(shape.base === "triangle", "「底面は三角形ですか」の形で聞いてみてね。");
-      }
-      if (includesAny(q, ["正方形", "せいほうけい"])) {
-        return ok(shape.base === "square", "「底面は正方形ですか」の形で聞いてみてね。");
-      }
-      if (includesAny(q, ["長方形", "ちょうほうけい"])) {
-        return ok(shape.base === "rectangle", "「底面は長方形ですか」の形で聞いてみてね。");
-      }
-    }
+function backToTop(){
+  clearInterval(timer);
+  timer = null;
+  startAt = null;
 
-    // 2) 曲面
-    if (includesAny(q, ["曲面", "きょくめん"])) {
-      // 「曲面ですか」「曲面がありますか」「面は曲面ですか」
-      return ok(shape.hasCurvedSurface === true, "「曲面がありますか」や「面は曲面ですか」と聞いてみてね。");
-    }
-    if (includesAny(q, ["まがって", "まるい面", "丸い面"])) {
-      return ok(shape.hasCurvedSurface === true, "「曲面がありますか」と聞くと確実だよ。");
-    }
+  document.getElementById("quizArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "none";
+  document.getElementById("preArea").style.display = "block";
 
-    // 3) 面の数
-    if (includesAny(q, ["面", "めん"]) && includesAny(q, ["数", "いくつ", "こ"])) {
-      const n = extractNumber(q);
-      if (n == null) return fail("数字（例：6、5、3）を入れて「面は6こですか」のように聞いてね。");
-      return ok(shape.faces === n, "「面は6こですか」のように数字を入れてね。");
-    }
+  setPills();
+  setTimePill();
+  showBest();
+}
 
-    // 4) 頂点
-    if (includesAny(q, ["頂点", "ちょうてん"])) {
-      const n = extractNumber(q);
-      if (n == null) return fail("数字（例：8、6、0）を入れて「頂点は8こですか」と聞いてね。");
-      return ok(shape.vertices === n, "「頂点は8こですか」のように数字を入れてね。");
-    }
+document.getElementById("startBtn").addEventListener("click", start);
+document.getElementById("retryBtn").addEventListener("click", start);
+document.getElementById("backBtn").addEventListener("click", backToTop);
+document.getElementById("resetBestBtn").addEventListener("click", ()=>{
+  localStorage.removeItem(BEST_KEY);
+  showBest();
+  alert("きろくを けしました。");
+});
+document.getElementById("cat").addEventListener("change", ()=>setPills());
 
-    // 5) 辺
-    if (includesAny(q, ["辺", "へん"])) {
-      if (includesAny(q, ["全部同じ", "ぜんぶおなじ", "同じ長さ", "おなじながさ"])) {
-        // 円柱は直線の辺がないので、ここは「いいえ」にしないため null を扱う
-        if (shape.allEdgesEqual === null) return ok(false, "円柱は「まっすぐな辺」がないので、別の質問（底面・曲面・面の数）がおすすめ。");
-        return ok(shape.allEdgesEqual === true, "「辺の長さは全部同じですか」で聞いてね。");
-      }
-      const n = extractNumber(q);
-      if (n == null) return fail("数字（例：12、9、2）を入れて「辺は12本ですか」と聞いてね。");
-      return ok(shape.edges === n, "「辺は12本ですか」のように数字を入れてね。");
-    }
-
-    // 6) 体積（式を聞くのは Yes/No に向かないので案内）
-    if (includesAny(q, ["体積", "たいせき"])) {
-      return fail("体積は「はい/いいえ」で答えにくいよ。代わりに「底面は丸ですか」「面は6こですか」などで聞いてね。");
-    }
-
-    return fail("対応していない聞き方かも。例：底面・曲面・面/頂点/辺の数・辺が全部同じ で聞いてみてね。");
-
-    function ok(ans, hint){ return { understood:true, answer:ans, reason:hint }; }
-    function fail(hint){ return { understood:false, answer:false, reason:hint }; }
-  }
-
-  function normalize(s){
-    return s
-      .replace(/[？\?]/g, "")
-      .replace(/\s+/g, "")
-      .toLowerCase();
-  }
-  function includesAny(s, arr){ return arr.some(w => s.includes(normalize(w))); }
-
-  function extractNumber(s){
-    // 半角数字があれば最優先
-    const m = s.match(/(\d{1,3})/);
-    if (m) return parseInt(m[1], 10);
-
-    // かんたんな漢数字（0-20）だけ対応
-    const map = {
-      "零":0,"〇":0,"一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
-      "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20
-    };
-    for (const k of Object.keys(map).sort((a,b)=>b.length-a.length)){
-      if (s.includes(k)) return map[k];
-    }
-    return null;
-  }
-
-  // ===== メッセージ表示 =====
-  function addMsg(text, cls){
-    const div = document.createElement("div");
-    div.className = "msg " + cls;
-    div.textContent = text;
-    logEl.appendChild(div);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-  function systemMsg(text){ addMsg("システム: " + text, "sys"); }
-
-  // ===== UI更新 =====
-  function updateUI(){
-    qCountEl.textContent = String(qCount);
-
-    if (!started){
-      phaseEl.textContent = "未開始";
-      statusPill.textContent = "「はじめる」を押してスタート";
-      qInput.disabled = true;
-      askBtn.disabled = true;
-      setGuessEnabled(false);
-      guessHelp.textContent = "「はじめる」を押すと、いつでも答えられます。";
-      return;
-    }
-
-    if (finished){
-      phaseEl.textContent = "回答タイム";
-      statusPill.textContent = "右の立体をクリックして答えてね";
-      qInput.disabled = true;
-      askBtn.disabled = true;
-      setGuessEnabled(true);
-      guessHelp.textContent = "答えをクリック！";
-      return;
-    }
-
-    phaseEl.textContent = "質問中";
-    statusPill.textContent = "質問を入力してね（のこり " + (3 - qCount) + " 回）";
-    qInput.disabled = false;
-    askBtn.disabled = false;
-    setGuessEnabled(true); // 途中でも答えられる
-    guessHelp.textContent = "質問は最大3回。途中でも答えられるよ。";
-  }
-
-  function setGuessEnabled(enabled){
-    choicesEl.querySelectorAll("button[data-guess]").forEach(btn => {
-      btn.disabled = !enabled;
-    });
-  }
-
-  // ===== 選択肢描画 =====
-  function renderChoices(){
-    choicesEl.innerHTML = "";
-    SHAPES.forEach(shape => {
-      const box = document.createElement("div");
-      box.className = "choice";
-      box.innerHTML = `
-        ${shape.svg}
-        <div>
-          <div class="name">${shape.name}</div>
-          <div class="desc">${shape.desc}</div>
-        </div>
-        <button data-guess="${shape.key}" class="primary">これ！</button>
-      `;
-      choicesEl.appendChild(box);
-    });
-
-    choicesEl.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-guess]");
-      if (!btn) return;
-      if (!started) return;
-
-      const guessKey = btn.getAttribute("data-guess");
-      const guessed = SHAPES.find(s => s.key === guessKey);
-
-      // まだ質問中でも、答えたら終了扱い
-      finished = true;
-
-      if (!secret){
-        systemMsg("まだゲームが始まっていません。「はじめる」を押してね。");
-        finished = false;
-        updateUI();
-        return;
-      }
-
-      addMsg("あなたの答え: " + guessed.name, "q");
-
-      if (guessed.key === secret.key){
-        addMsg("アプリ: せいかい！ 🎉（答えは「" + secret.name + "」）", "a");
-        addMsg("✅ お見事！", "sys");
-      }else{
-        addMsg("アプリ: ざんねん…（せいかいは「" + secret.name + "」）", "a");
-        addMsg("💡 もう一度やるなら「はじめる」を押してね。", "sys");
-      }
-
-      updateUI();
-    }, { once:false });
-  }
-
-  // ===== SVG（簡単イラスト）=====
-  function cubeSVG(){
-    return `
-      <svg viewBox="0 0 64 64" aria-label="cube">
-        <defs>
-          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(110,231,255,.9)"/>
-            <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
-          </linearGradient>
-        </defs>
-        <polygon points="18,18 40,10 54,22 32,30" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polygon points="18,18 32,30 32,54 18,42" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polygon points="32,30 54,22 54,46 32,54" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polyline points="18,18 18,42 32,54 54,46 54,22 40,10 18,18" fill="none" stroke="url(#g1)" stroke-width="2" opacity=".75"/>
-      </svg>
-    `;
-  }
-
-  function rectPrismSVG(){
-    return `
-      <svg viewBox="0 0 64 64" aria-label="rectangular prism">
-        <defs>
-          <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(110,231,255,.9)"/>
-            <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
-          </linearGradient>
-        </defs>
-        <polygon points="12,20 38,12 56,22 30,30" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polygon points="12,20 30,30 30,54 12,44" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polygon points="30,30 56,22 56,46 30,54" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
-        <polyline points="12,20 12,44 30,54 56,46 56,22 38,12 12,20" fill="none" stroke="url(#g2)" stroke-width="2" opacity=".75"/>
-      </svg>
-    `;
-  }
-
-  function cylinderSVG(){
-    return `
-      <svg viewBox="0 0 64 64" aria-label="cylinder">
-        <defs>
-          <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(110,231,255,.9)"/>
-            <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="32" cy="16" rx="18" ry="8" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>
-        <path d="M14,16 v28 c0,4.5 8.1,8 18,8 s18-3.5 18-8 V16"
-              fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>
-        <ellipse cx="32" cy="44" rx="18" ry="8" fill="rgba(255,255,255,.04)" stroke="url(#g3)" stroke-width="2" opacity=".9"/>
-      </svg>
-    `;
-  }
-
-  function triPrismSVG(){
-    return `
-      <svg viewBox="0 0 64 64" aria-label="triangular prism">
-        <defs>
-          <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(110,231,255,.9)"/>
-            <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
-          </linearGradient>
-        </defs>
-        <polygon points="16,44 26,18 36,44" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>
-        <polygon points="28,48 38,22 48,48" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>
-        <polygon points="16,44 28,48 48,48 36,44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>
-        <polyline points="26,18 38,22" fill="none" stroke="url(#g4)" stroke-width="2" opacity=".9"/>
-        <polyline points="16,44 28,48" fill="none" stroke="url(#g4)" stroke-width="2" opacity=".9"/>
-        <polyline points="36,44 48,48" fill="none" stroke="url(#g4)" stroke-width="2" opacity=".9"/>
-      </svg>
-    `;
-  }
-
-  // 初期メッセージ
-  systemMsg("「はじめる」を押すと、クイズが始まるよ。");
-  updateUI();
-
-})();
+showBest();
+setPills();
+setTimePill();
 </script>
 </body>
 </html>
+```
